@@ -289,7 +289,29 @@ La característica diferenciadora de v2.0 será la integración profunda de IA g
 - Cumplimiento GDPR/LPDP Argentina para datos personales
 
 ### 5.4 Integraciones Estratégicas
-- **E-commerce:** Integración con TiendaNube, MercadoLibre y WooCommerce (sync de productos, stock y pedidos)
+
+#### GestioNube Shop (eCommerce Propio) ⭐
+Se desarrollará un **eCommerce propio como proyecto independiente** (`gestionube-shop`) que se conecta al ERP mediante API REST. Este proyecto no es un plugin de TiendaNube ni WooCommerce — es una tienda online nativa del ecosistema GestioNube.
+
+**Flujo de sincronización:**
+- **Productos → Shop:** el ERP empuja catálogo de productos (nombre, precio, descripción, imágenes, stock disponible) hacia la tienda vía webhook o polling
+- **Stock → Shop:** cada movimiento de inventario en el ERP (venta, ajuste, transferencia) actualiza el stock en tiempo real en la tienda
+- **Pedidos → ERP:** cada pedido confirmado en la tienda genera automáticamente una factura de venta en el ERP y descuenta stock
+- **Clientes → ambos:** los clientes creados en la tienda se sincronizan como contrapartes en el ERP y viceversa
+- **Pagos → ERP:** los pagos recibidos en la tienda (MercadoPago, transferencia) crean transacciones en el módulo de Tesorería
+
+**Datos sincronizados:**
+| Entidad | Dirección | Frecuencia |
+|---------|-----------|-----------|
+| Productos (precio, descripción, imagen) | ERP → Shop | On-change (webhook) |
+| Stock disponible por sucursal | ERP → Shop | On-change (webhook) |
+| Pedidos nuevos | Shop → ERP | On-event (webhook) |
+| Estado de pedido | ERP → Shop | On-change |
+| Clientes / Contrapartes | Bidireccional | On-create |
+| Pagos confirmados | Shop → ERP | On-event |
+
+**Autenticación API:** OAuth2 con client_credentials (machine-to-machine), tenant-aware (cada tenant tiene sus propias credenciales de API).
+
 - **Bancos:** Conexión con APIs bancarias abiertas para importar movimientos automáticamente
 - **AFIP:** Importación automática de compras desde el servicio web de AFIP (sin cargar facturas manualmente)
 - **Correo:** Integración con Andreani / OCA para seguimiento de envíos desde OC o factura
@@ -307,15 +329,20 @@ doc/
 │
 │ ── FASE 1: Fundación ──
 ├── 01-auth/
-│   └── 01-auth.md                 ✅ Completado
+│   ├── 01-auth.md                 ✅ Completado
+│   └── 01-auth-user-stories.md   ✅ Completado
 ├── 02-tenant/
-│   └── 02-tenant.md
+│   ├── 02-tenant.md               ✅ Completado
+│   └── 02-tenant-user-stories.md ✅ Completado
 ├── 03-rbac/
-│   └── 03-rbac.md
+│   ├── 03-rbac.md                 ✅ Completado
+│   └── 03-rbac-user-stories.md   ✅ Completado
 ├── 04-users/
-│   └── 04-users.md
+│   ├── 04-users.md                ✅ Completado
+│   └── 04-users-user-stories.md  ✅ Completado
 ├── 05-suscription/
-│   └── 05-suscription.md
+│   ├── 05-suscription.md              ✅ Completado
+│   └── 05-suscription-user-stories.md ✅ Completado
 │
 │ ── FASE 2: Operaciones Core ──
 ├── 06-dashboard/
