@@ -46,33 +46,42 @@ La versión actual está construida sobre **Laravel 13 + React 19 + Inertia.js**
 - Exportación a PDF y Excel
 - Márgenes configurables por producto y tenant
 
-### 2.6 Inventario (`inventory`, `batch`)
-- Control de stock por lote (`Batch`) con fecha de vencimiento y número de lote
-- Inventario consolidado por sucursal (`BranchStock`)
-- Movimientos de inventario: ingresos, egresos, ajustes
-- Estadísticas de inventario (stock total, valor, rotación)
+### 2.6 Lotes (`batch`)
+- CRUD completo de lotes con número de lote, código de barras y fecha de vencimiento
+- Lote es una entidad **global** (creada por un tenant, puede ser compartida por sucursales vía transferencia)
+- El stock real por sucursal vive en `BranchStock` — la cantidad NO está en `Batch`
+- Ajuste manual de cantidad por lote
+- Descuento automático de stock al emitir/anular facturas (`UpdateBatchQuantitiesFromInvoiceAction`)
+- Exportación a Excel, estadísticas de lotes críticos y próximos a vencer
+- Estados de lote: `ACTIVE | NEGATIVE | EXPIRING_SOON | EXPIRED | DELETED | DISABLED | DEPLETED`
+
+### 2.7 Inventario (`inventory`)
+- Vista consolidada del stock por sucursal (`BranchStock`) sobre los lotes existentes
+- Estadísticas: stock total, valor de inventario, alertas de stock crítico
+- Detalle de inventario por producto con historial de movimientos
+- Calculadora de inventario (entrada/salida/estado)
 - Exportación detallada y resumida a Excel
-- Calculadora de inventario
 
-### 2.7 Transferencias de Stock (`stock-transfer`)
+### 2.8 Transferencias de Stock (`stock-transfer`)
 - Transferencias de productos entre sucursales
-- Estados: borrador → en tránsito → completada / cancelada
-- Integración con lotes específicos
+- Stock se deduce en origen al crear (status PENDING = reservado), se suma en destino al completar
+- Snapshots de cantidades antes/después para auditoría y rollback
+- Estados: `PENDING → COMPLETED / CANCELLED`
 
-### 2.8 Clientes y Proveedores (`clients`, `providers`)
+### 2.9 Clientes y Proveedores (`clients`, `providers`)
 - Modelo unificado `Counterparty` para clientes y proveedores
 - ABM completo con búsqueda y attach a tenant
 - Datos fiscales (CUIT, condición IVA)
 - Direcciones y contactos asociados
 
-### 2.9 Presupuestos (`budget`)
+### 2.10 Presupuestos (`budget`)
 - Creación de presupuestos con productos
 - Estados: borrador → completado
 - Conversión a factura de venta
 - Generación de PDF
 - Cálculo de totales con impuestos
 
-### 2.10 Facturación de Ventas (`invoices-sale`)
+### 2.11 Facturación de Ventas (`invoices-sale`)
 - Facturas A, B, C, M, X con tipo de comprobante correcto según AFIP
 - Notas de crédito
 - Integración con **AFIP/ARCA** vía WSFE (webservice de factura electrónica)
@@ -82,20 +91,20 @@ La versión actual está construida sobre **Laravel 13 + React 19 + Inertia.js**
 - Cancelación y restauración de stock
 - Exportación de libro IVA a Excel
 
-### 2.11 Facturación de Compras (`invoices-purchase`)
+### 2.12 Facturación de Compras (`invoices-purchase`)
 - Registro de facturas de proveedores
 - Reconciliación y aprobación de reconciliación
 - Actualización de precios de productos desde factura
 - Generación de PDF
 - Creación de factura desde orden de compra
 
-### 2.12 Órdenes de Compra (`purchase-orders`)
+### 2.13 Órdenes de Compra (`purchase-orders`)
 - Flujo completo: borrador → aprobada → rechazada → finalizada
 - Numeración automática de OC
 - Generación de PDF de OC
 - Conversión directa a factura de compra
 
-### 2.13 Tesorería (`treasury`)
+### 2.14 Tesorería (`treasury`)
 - Registro de transacciones (pagos y cobros) vinculados a facturas o independientes
 - Resúmenes de cuenta por contraparte (saldo corriente, deuda, crédito)
 - Detalle de cuenta por contraparte con historial de movimientos
@@ -104,13 +113,13 @@ La versión actual está construida sobre **Laravel 13 + React 19 + Inertia.js**
 - Recibos en PDF
 - Exportación a Excel (transacciones y resúmenes de cuenta)
 
-### 2.14 Caja (`cashier`)
+### 2.15 Caja (`cashier`)
 - Apertura y cierre de turno
 - Registro de movimientos de caja por turno
 - Historial de turnos y movimientos
 - Vinculación de transacciones a turno de caja
 
-### 2.15 Reportes (`report`)
+### 2.16 Reportes (`report`)
 - Comportamiento de clientes: frecuencia, ticket promedio, RFM
 - Lealtad de clientes (con exportación Excel)
 - Ventas por producto (ranking, rotación)
@@ -119,7 +128,7 @@ La versión actual está construida sobre **Laravel 13 + React 19 + Inertia.js**
 - Predicción de compras con configuración de stock mínimo y reposición
 - Libro IVA ventas exportable
 
-### 2.16 Integración AFIP/ARCA (`arca`)
+### 2.17 Integración AFIP/ARCA (`arca`)
 - Gestión de certificados digitales (`ArcaCertificate`)
 - Login tickets WSAA (`ArcaLoginTicket`, `ArcaLoginTicketRequest`)
 - Autorización de CAE (WSFE)
@@ -127,20 +136,20 @@ La versión actual está construida sobre **Laravel 13 + React 19 + Inertia.js**
 - Probe de conectividad y dummy test
 - Consulta de puntos de venta y condiciones IVA receptor
 
-### 2.17 Usuarios y Roles (`users`)
+### 2.18 Usuarios y Roles (`users`)
 - ABM de usuarios por tenant
 - Asignación de roles y permisos granulares
 - Control de acceso basado en roles (RBAC)
 
-### 2.18 Notificaciones y Actividad (`activity`, `notifications`)
+### 2.19 Notificaciones y Actividad (`activity`, `notifications`)
 - Log de actividad del sistema
 - Centro de notificaciones
 
-### 2.19 Superadmin (`super-admin`)
+### 2.20 Superadmin (`super-admin`)
 - Panel de gestión global de tenants y planes
 - Gestión de suscripciones desde el panel administrativo
 
-### 2.20 Feedback (`feedback`)
+### 2.21 Feedback (`feedback`)
 - Sistema interno de feedback de usuarios
 - Mensajes de consulta desde el landing
 
@@ -329,58 +338,76 @@ doc/
 │
 │ ── FASE 1: Fundación ──
 ├── 01-auth/
-│   ├── 01-auth.md                 ✅ Completado
-│   └── 01-auth-user-stories.md   ✅ Completado
+│   ├── 01-auth.md                       ✅ Completado
+│   └── 01-auth-user-stories.md         ✅ Completado
 ├── 02-tenant/
-│   ├── 02-tenant.md               ✅ Completado
-│   └── 02-tenant-user-stories.md ✅ Completado
+│   ├── 02-tenant.md                     ✅ Completado
+│   └── 02-tenant-user-stories.md       ✅ Completado
 ├── 03-rbac/
-│   ├── 03-rbac.md                 ✅ Completado
-│   └── 03-rbac-user-stories.md   ✅ Completado
+│   ├── 03-rbac.md                       ✅ Completado
+│   └── 03-rbac-user-stories.md         ✅ Completado
 ├── 04-users/
-│   ├── 04-users.md                ✅ Completado
-│   └── 04-users-user-stories.md  ✅ Completado
+│   ├── 04-users.md                      ✅ Completado
+│   └── 04-users-user-stories.md        ✅ Completado
 ├── 05-suscription/
-│   ├── 05-suscription.md              ✅ Completado
-│   └── 05-suscription-user-stories.md ✅ Completado
+│   ├── 05-suscription.md               ✅ Completado
+│   └── 05-suscription-user-stories.md  ✅ Completado
 │
 │ ── FASE 2: Operaciones Core ──
 ├── 06-dashboard/
-│   └── 06-dashboard.md
+│   ├── 06-dashboard.md                  ✅ Completado
+│   └── 06-dashboard-user-stories.md    ✅ Completado
 ├── 07-products/
-│   └── 07-products.md
-├── 08-inventory/
-│   └── 08-inventory.md
-├── 09-stock-transfer/
-│   └── 09-stock-transfer.md
-├── 10-clients-providers/
-│   └── 10-clients-providers.md
+│   ├── 07-products.md                   ✅ Completado
+│   └── 07-products-user-stories.md     ✅ Completado
+├── 08-batches/
+│   ├── 08-batches.md                    ✅ Completado
+│   └── 08-batches-user-stories.md      ✅ Completado
+├── 09-inventory/
+│   ├── 09-inventory.md                  ✅ Completado
+│   └── 09-inventory-user-stories.md    ✅ Completado
+├── 10-stock-transfer/
+│   ├── 10-stock-transfer.md             ✅ Completado
+│   └── 10-stock-transfer-user-stories.md ✅ Completado
+├── 11-clients-providers/
+│   ├── 11-clients-providers.md             ✅ Completado
+│   └── 11-clients-providers-user-stories.md ✅ Completado
 │
 │ ── FASE 3: Ciclo Comercial ──
-├── 11-budget/
-│   └── 11-budget.md
-├── 12-invoice-sales/
-│   └── 12-invoice-sales.md
-├── 13-arca/
-│   └── 13-arca.md
-├── 14-purchase-orders/
-│   └── 14-purchase-orders.md
-├── 15-invoice-purchase/
-│   └── 15-invoice-purchase.md
+├── 12-budget/
+│   ├── 12-budget.md                     ✅ Completado
+│   └── 12-budget-user-stories.md        ✅ Completado
+├── 13-invoice-sales/
+│   ├── 13-invoice-sales.md              ✅ Completado
+│   └── 13-invoice-sales-user-stories.md ✅ Completado
+├── 14-arca/
+│   ├── 14-arca.md                       ✅ Completado
+│   └── 14-arca-user-stories.md          ✅ Completado
+├── 15-purchase-orders/
+│   ├── 15-purchase-orders.md            ✅ Completado
+│   └── 15-purchase-orders-user-stories.md ✅ Completado
+├── 16-invoice-purchase/
+│   ├── 16-invoice-purchase.md           ✅ Completado
+│   └── 16-invoice-purchase-user-stories.md ✅ Completado
 │
 │ ── FASE 4: Finanzas y Reportes ──
-├── 16-treasury/
-│   └── 16-treasury.md
-├── 17-cashier/
-│   └── 17-cashier.md
-├── 18-reports/
-│   └── 18-reports.md
+├── 17-treasury/
+│   ├── 17-treasury.md                   ✅ Completado
+│   └── 17-treasury-user-stories.md      ✅ Completado
+├── 18-cashier/
+│   ├── 18-cashier.md                    ✅ Completado
+│   └── 18-cashier-user-stories.md       ✅ Completado
+├── 19-reports/
+│   ├── 19-reports.md                    ✅ Completado
+│   └── 19-reports-user-stories.md       ✅ Completado
 │
 │ ── FASE 5: Extras y v2.0 ──
-├── 19-superadmin/
-│   └── 19-superadmin.md
-└── 20-ai-agents/
-    └── 20-ai-agents.md           ← Nuevo módulo v2.0 (diseño puro)
+├── 20-superadmin/
+│   ├── 20-superadmin.md                 ✅ Completado
+│   └── 20-superadmin-user-stories.md    ✅ Completado
+└── 21-ai-agents/
+    ├── 21-ai-agents.md                  ✅ Completado
+    └── 21-ai-agents-user-stories.md     ✅ Completado
 ```
 
 Cada documento de módulo incluye:
@@ -487,10 +514,10 @@ La tabla `invoices` **NO tiene columnas `total`, `subtotal`, `total_tax` ni `tot
 #### Inventario
 | Tabla | Columnas clave | Módulo |
 |-------|---------------|--------|
-| `batches` | id, product_id, tenant_id, batch_number, barcode, expiration_date, status, deleted_at | 08-inventory |
-| `branch_stocks` | id, tenant_id, batch_id, product_id, quantity (int), deleted_at | 08-inventory |
-| `stock_transfers` | id, source_tenant_id, destination_tenant_id, status, initiated_by (user_id), received_by (user_id), notes, completed_at, deleted_at | 09-stock-transfer |
-| `stock_transfer_items` | id, stock_transfer_id, product_id, batch_id, quantity, source_quantity_before, source_quantity_after, dest_quantity_before, dest_quantity_after | 09-stock-transfer |
+| `batches` | id, product_id, tenant_id, batch_number, barcode, expiration_date, status, deleted_at | 08-batches |
+| `branch_stocks` | id, tenant_id, batch_id, product_id, quantity (int), deleted_at | 08-batches |
+| `stock_transfers` | id, source_tenant_id, destination_tenant_id, status, initiated_by (user_id), received_by (user_id), notes, completed_at, deleted_at | 10-stock-transfer |
+| `stock_transfer_items` | id, stock_transfer_id, product_id, batch_id, quantity, source_quantity_before, source_quantity_after, dest_quantity_before, dest_quantity_after | 10-stock-transfer |
 
 #### Contrapartes (Clientes y Proveedores)
 | Tabla | Columnas clave | Módulo |
