@@ -1,0 +1,27 @@
+{
+  "name": "gestionube_cf",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "check-types": "turbo run check-types",
+    "db:generate": "pnpm --filter @repo/api db:generate",
+    "migrate:local": "pnpm --filter @repo/api exec -- wrangler d1 migrations apply DB --local",
+    "migrate:remote": "pnpm --filter @repo/api exec -- wrangler d1 migrations apply DB --remote",
+    "db:studio": "pnpm --filter @repo/api db:studio",
+    "ui:add": "cd packages/ui && pnpm dlx shadcn@latest add"
+  },
+  "devDependencies": {
+    "prettier": "^3.7.4",
+    "turbo": "^2.9.18",
+    "typescript": "6.0.3"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=18"
+  },
+  "author": "Diego Nelson (3 Lineas)",
+  "version": "1.0.2"
+}
