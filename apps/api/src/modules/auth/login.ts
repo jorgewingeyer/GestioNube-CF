@@ -31,7 +31,7 @@ export const loginRouter = new Hono<{
           success: false,
           message:
             "No pudimos acceder a tu cuenta. Por favor, verifica que tu correo y contraseña sean correctos e inténtalo de nuevo.",
-          error: e instanceof Error ? e.message : "Unknown error",
+          error: e instanceof Error ? e.message : "Error desconocido",
         },
         401,
       );

@@ -21,7 +21,7 @@ export const registerUserAction = async (
     .get();
 
   if (existing) {
-    throw new Error("El usuario ya existe");
+    throw new Error("Este correo electrónico ya se encuentra registrado en nuestro sistema.");
   }
 
   // Hash password

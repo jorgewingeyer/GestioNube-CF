@@ -24,7 +24,7 @@ export function RegisterForm() {
               <Input
                 {...field}
                 id={field.name}
-                placeholder="Juan Pérez"
+                placeholder="Ej: Ana López Martínez"
                 autoComplete="name"
                 disabled={isSubmitting}
                 aria-invalid={fieldState.invalid}
@@ -44,7 +44,7 @@ export function RegisterForm() {
                 {...field}
                 id={field.name}
                 type="email"
-                placeholder="tu@ejemplo.com"
+                placeholder="tu.correo@ejemplo.com"
                 autoComplete="email"
                 disabled={isSubmitting}
                 aria-invalid={fieldState.invalid}
