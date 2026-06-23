@@ -19,7 +19,7 @@ export const listRouter = new Hono<{
         success: false,
         message:
           "No pudimos recuperar la lista de usuarios en este momento. Por favor, intenta recargar la página.",
-        error: e instanceof Error ? e.message : "Unknown error",
+        error: e instanceof Error ? e.message : "Error desconocido",
       },
       500,
     );

@@ -50,12 +50,29 @@ export function useRegister() {
   const { isSubmitting } = form.formState;
 
   async function onSubmit(values: RegisterSchema) {
-    const res = await registerAction(values);
-    if (res.success) {
-      toast.success(res.message);
+    const promise = (async () => {
+      const res = await registerAction(values);
+
+      if (!res.success) {
+        throw new Error(res.message || "Ocurrió un error inesperado.");
+      }
+
       router.push("/login");
-    } else {
-      toast.error(res.message);
+      return res.message;
+    })();
+
+    toast.promise(promise, {
+      loading: "Creando tu cuenta...",
+      success: (message) => message as string,
+      error: (err) =>
+        err.message ||
+        "No pudimos registrar tu cuenta. Por favor, inténtalo nuevamente.",
+    });
+
+    try {
+      await promise;
+    } catch (error) {
+      // Error manejado por toast.promise
     }
   }
 

@@ -20,12 +20,12 @@ export function LoginForm() {
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+              <FieldLabel htmlFor={field.name}>Correo Electrónico</FieldLabel>
               <Input
                 {...field}
                 id={field.name}
                 type="email"
-                placeholder="m@example.com"
+                placeholder="tu.correo@ejemplo.com"
                 autoComplete="email"
                 disabled={isSubmitting}
                 aria-invalid={fieldState.invalid}

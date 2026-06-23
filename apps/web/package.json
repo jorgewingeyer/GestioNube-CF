@@ -16,6 +16,7 @@
     "@hookform/resolvers": "^5.4.0",
     "@repo/api": "workspace:*",
     "@repo/ui": "workspace:*",
+    "date-fns": "^4.1.0",
     "drizzle-orm": "0.45.2",
     "hono": "^4.12.26",
     "jose": "^6.1.3",

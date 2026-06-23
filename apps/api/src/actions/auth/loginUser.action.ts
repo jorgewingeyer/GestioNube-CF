@@ -22,14 +22,18 @@ export const loginUserAction = async (
     .get();
 
   if (!user) {
-    throw new Error("Credenciales inválidas");
+    throw new Error(
+      "Lo sentimos, el correo o la contraseña son incorrectos. Por favor, verifica tus datos e inténtalo de nuevo.",
+    );
   }
 
   // Verify password
   const isValid = await verifyPassword(input.password, user.password);
 
   if (!isValid) {
-    throw new Error("Credenciales inválidas");
+    throw new Error(
+      "Lo sentimos, el correo o la contraseña son incorrectos. Por favor, verifica tus datos e inténtalo de nuevo.",
+    );
   }
 
   // Generate token

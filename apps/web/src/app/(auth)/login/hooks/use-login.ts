@@ -6,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { loginAction } from "@/actions/auth/login-action";
-import { useState } from "react";
 
 const loginSchema = z.object({
   email: z.email({ message: "Ingresa un correo válido para continuar." }),
@@ -19,7 +18,6 @@ export type LoginSchema = z.infer<typeof loginSchema>;
 
 export function useLogin() {
   const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
@@ -29,16 +27,34 @@ export function useLogin() {
     },
   });
 
-  async function onSubmit(values: LoginSchema) {
-    setIsSubmitting(true);
-    const res = await loginAction(values);
+  const { isSubmitting } = form.formState;
 
-    if (res.success) {
-      toast.success(res.message);
+  async function onSubmit(values: LoginSchema) {
+    const promise = (async () => {
+      const res = await loginAction(values);
+
+      if (!res.success) {
+        throw new Error(
+          res.message.toString() || "Ocurrió un error inesperado.",
+        );
+      }
+
       router.push("/dashboard");
-    } else {
-      setIsSubmitting(false);
-      toast.error(res.message);
+      return res.message;
+    })();
+
+    toast.promise(promise, {
+      loading: "Iniciando sesión...",
+      success: (message) => message as string,
+      error: (err) =>
+        err.message ||
+        "No pudimos iniciar sesión. Por favor, inténtalo nuevamente.",
+    });
+
+    try {
+      await promise;
+    } catch (error) {
+      // Error manejado por toast.promise
     }
   }
 

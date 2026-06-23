@@ -33,10 +33,10 @@ export const registerRouter = new Hono<{
         {
           success: false,
           message:
-            e instanceof Error && e.message === "El usuario ya existe"
+            e instanceof Error && e.message === "Este correo electrónico ya se encuentra registrado en nuestro sistema."
               ? "Vaya, parece que este correo electrónico ya está registrado. ¿Quizás quisiste iniciar sesión?"
               : "Tuvimos un pequeño problema al crear tu cuenta. Por favor, inténtalo de nuevo en unos momentos.",
-          error: e instanceof Error ? e.message : "Unknown error",
+          error: e instanceof Error ? e.message : "Error desconocido",
         },
         400,
       );
