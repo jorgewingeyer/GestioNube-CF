@@ -19,25 +19,6 @@ export default function LoginPage() {
       </CardHeader>
       <CardContent>
         <LoginForm />
-        {/* <EasyForm
-          submitPath={AuthController.doLogin()}
-          buttonText="Acceder"
-          buttonClass="w-full"
-          fields={[
-            {
-              name: "email",
-              type: "email",
-              label: "Correo Electrónico",
-              placeholder: "tu.correo@ejemplo.com",
-            },
-            {
-              name: "password",
-              type: "password",
-              label: "Contraseña",
-              placeholder: "••••••••",
-            },
-          ]}
-        /> */}
         <div className="mt-4 text-center text-sm">
           ¿Eres nuevo/a aquí?{" "}
           <Link href="/register" className="underline underline-offset-4">
