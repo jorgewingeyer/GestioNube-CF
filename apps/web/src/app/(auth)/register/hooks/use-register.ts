@@ -54,7 +54,10 @@ export function useRegister() {
       const res = await registerAction(values);
 
       if (!res.success) {
-        throw new Error(res.message || "Ocurrió un error inesperado.");
+        throw new Error(
+          res.message ||
+            "No pudimos registrar tu cuenta. Por favor, inténtalo nuevamente.",
+        );
       }
 
       router.push("/login");
@@ -64,9 +67,7 @@ export function useRegister() {
     toast.promise(promise, {
       loading: "Creando tu cuenta...",
       success: (message) => message as string,
-      error: (err) =>
-        err.message ||
-        "No pudimos registrar tu cuenta. Por favor, inténtalo nuevamente.",
+      error: (err) => err.message,
     });
 
     try {
