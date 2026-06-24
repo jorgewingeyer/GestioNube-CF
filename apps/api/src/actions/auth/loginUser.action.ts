@@ -2,12 +2,15 @@ import * as schema from "../../db/schema";
 import { eq } from "drizzle-orm";
 import { DrizzleD1Database } from "drizzle-orm/d1";
 import { signJWT, verifyPassword } from "../../lib/crypto";
+import { AuthenticationError } from "../../errors";
 
 /**
- * Login user and generate JWT token
- * @param db Database instance
- * @param input Login credentials
- * @returns User data and token
+ * Login user and generate JWT token.
+ * Throws AuthenticationError if user is not found or verification fails.
+ * @param db - Database instance.
+ * @param input - Login credentials.
+ * @param jwtSecret - Private secret for token signature.
+ * @returns User data and token.
  */
 export const loginUserAction = async (
   db: DrizzleD1Database<typeof schema>,
@@ -22,7 +25,7 @@ export const loginUserAction = async (
     .get();
 
   if (!user) {
-    throw new Error(
+    throw new AuthenticationError(
       "Lo sentimos, el correo o la contraseña son incorrectos. Por favor, verifica tus datos e inténtalo de nuevo.",
     );
   }
@@ -31,7 +34,7 @@ export const loginUserAction = async (
   const isValid = await verifyPassword(input.password, user.password);
 
   if (!isValid) {
-    throw new Error(
+    throw new AuthenticationError(
       "Lo sentimos, el correo o la contraseña son incorrectos. Por favor, verifica tus datos e inténtalo de nuevo.",
     );
   }

@@ -2,12 +2,14 @@ import * as schema from "../../db/schema";
 import { eq } from "drizzle-orm";
 import { DrizzleD1Database } from "drizzle-orm/d1";
 import { hashPassword } from "../../lib/crypto";
+import { DuplicateEmailError } from "../../errors";
 
 /**
- * Register a new user in the database
- * @param db Database instance
- * @param input User registration data
- * @returns Created user or null if user already exists
+ * Register a new user in the database.
+ * Throws AppError if email is already registered.
+ * @param db - Database instance.
+ * @param input - User registration data.
+ * @returns Created user details.
  */
 export const registerUserAction = async (
   db: DrizzleD1Database<typeof schema>,
@@ -21,7 +23,7 @@ export const registerUserAction = async (
     .get();
 
   if (existing) {
-    throw new Error("Este correo electrónico ya se encuentra registrado en nuestro sistema.");
+    throw new DuplicateEmailError();
   }
 
   // Hash password
