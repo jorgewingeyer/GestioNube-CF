@@ -9,7 +9,7 @@ export class AuthenticationError extends AppError {
    * @param message - User-facing warning message.
    */
   constructor(message = "Credenciales incorrectas") {
-    super(message, 401, "UNAUTHORIZED");
+    super({ message, statusCode: 401, code: "UNAUTHORIZED" });
     this.name = "AuthenticationError";
   }
 }

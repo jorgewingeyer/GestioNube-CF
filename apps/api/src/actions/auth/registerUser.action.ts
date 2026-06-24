@@ -2,7 +2,7 @@ import * as schema from "../../db/schema";
 import { eq } from "drizzle-orm";
 import { DrizzleD1Database } from "drizzle-orm/d1";
 import { hashPassword } from "../../lib/crypto";
-import { AppError } from "../../errors";
+import { DuplicateEmailError } from "../../errors";
 
 /**
  * Register a new user in the database.
@@ -23,11 +23,7 @@ export const registerUserAction = async (
     .get();
 
   if (existing) {
-    throw new AppError(
-      "Vaya, parece que este correo electrónico ya está registrado. ¿Quizás quisiste iniciar sesión?",
-      400,
-      "EMAIL_ALREADY_REGISTERED",
-    );
+    throw new DuplicateEmailError();
   }
 
   // Hash password

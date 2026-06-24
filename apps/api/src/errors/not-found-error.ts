@@ -9,7 +9,7 @@ export class NotFoundError extends AppError {
    * @param message - User-facing warning message.
    */
   constructor(message = "Recurso no encontrado") {
-    super(message, 404, "NOT_FOUND");
+    super({ message, statusCode: 404, code: "NOT_FOUND" });
     this.name = "NotFoundError";
   }
 }
