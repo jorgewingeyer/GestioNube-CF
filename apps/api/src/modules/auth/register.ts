@@ -15,13 +15,14 @@ export const registerRouter = new Hono<{
       name: z.string().min(2),
       email: z.string().email(),
       password: z.string().min(6),
+      passwordConfirmation: z.string().optional(),
     }),
   ),
   async (c) => {
-    const input = c.req.valid("json");
+    const { name, email, password } = c.req.valid("json");
     const db = c.get("db");
     
-    const result = await registerUserAction(db, input);
+    const result = await registerUserAction(db, { name, email, password });
 
     return c.json({
       success: true,

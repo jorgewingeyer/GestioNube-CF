@@ -22,6 +22,7 @@ export const tenants = pgTable("tenants", {
   phone: varchar("phone", { length: 255 }),
   email: varchar("email", { length: 255 }).unique(),
   logo_url: varchar("logo_url", { length: 255 }),
+  address_id: integer("address_id").references(() => addresses.id),
   parent_id: integer("parent_id"), // self reference
   active: boolean("active").default(true),
   suspended_reason: text("suspended_reason"),
@@ -39,13 +40,44 @@ export const users = pgTable("users", {
   email_verified_at: timestamp("email_verified_at"),
   password: varchar("password", { length: 255 }).notNull(),
   remember_token: varchar("remember_token", { length: 100 }),
-  address_id: integer("address_id"), // Refers to addresses
+  address_id: integer("address_id").references(() => addresses.id),
   dni: integer("dni"),
   phone: varchar("phone", { length: 255 }),
   is_super_admin: boolean("is_super_admin").default(false),
   created_at: timestamp("created_at").defaultNow(),
   updated_at: timestamp("updated_at").defaultNow(),
   deleted_at: timestamp("deleted_at"),
+});
+
+export const provinces = pgTable("provinces", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  lat: varchar("lat", { length: 255 }),
+  lon: varchar("lon", { length: 255 }),
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
+});
+
+export const locations = pgTable("locations", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  province_id: integer("province_id")
+    .notNull()
+    .references(() => provinces.id, { onDelete: "cascade" }),
+  lat: varchar("lat", { length: 255 }),
+  lon: varchar("lon", { length: 255 }),
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
+});
+
+export const addresses = pgTable("addresses", {
+  id: serial("id").primaryKey(),
+  address: varchar("address", { length: 255 }).notNull(),
+  location_id: integer("location_id")
+    .notNull()
+    .references(() => locations.id, { onDelete: "cascade" }),
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
 });
 
 export const tenantUsers = pgTable("tenant_user", {
@@ -175,6 +207,73 @@ export const invoiceProducts = pgTable("invoice_product", {
   updated_at: timestamp("updated_at").defaultNow(),
 });
 
+export const roles = pgTable("roles", {
+  id: serial("id").primaryKey(),
+  tenant_id: integer("tenant_id")
+    .notNull()
+    .references(() => tenants.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 255 }).notNull(),
+  guard_name: varchar("guard_name", { length: 255 }).default("web"),
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
+  deleted_at: timestamp("deleted_at"),
+});
+
+export const permissions = pgTable("permissions", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull().unique(),
+  guard_name: varchar("guard_name", { length: 255 }).default("web"),
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
+  deleted_at: timestamp("deleted_at"),
+});
+
+export const permissionRole = pgTable("permission_role", {
+  id: serial("id").primaryKey(),
+  permission_id: integer("permission_id")
+    .notNull()
+    .references(() => permissions.id, { onDelete: "cascade" }),
+  role_id: integer("role_id")
+    .notNull()
+    .references(() => roles.id, { onDelete: "cascade" }),
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
+});
+
+export const roleUser = pgTable("role_user", {
+  id: serial("id").primaryKey(),
+  role_id: integer("role_id")
+    .notNull()
+    .references(() => roles.id, { onDelete: "cascade" }),
+  user_id: integer("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
+});
+
+export const taxes = pgTable("taxes", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull().unique(),
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
+  deleted_at: timestamp("deleted_at"),
+});
+
+export const taxTenants = pgTable("tax_tenant", {
+  id: serial("id").primaryKey(),
+  tenant_id: integer("tenant_id")
+    .notNull()
+    .references(() => tenants.id, { onDelete: "cascade" }),
+  tax_id: integer("tax_id")
+    .notNull()
+    .references(() => taxes.id, { onDelete: "cascade" }),
+  value: decimal("value", { precision: 10, scale: 2 }).notNull(),
+  is_preferred: boolean("is_preferred").default(false),
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
+});
+
 // -----------------------------------------------------------------------------
 // RELATIONS
 // -----------------------------------------------------------------------------
@@ -191,10 +290,42 @@ export const tenantsRelations = relations(tenants, ({ many, one }) => ({
   productTenants: many(productTenants),
   counterparties: many(counterpartyTenants),
   invoices: many(invoices),
+  roles: many(roles),
+  taxes: many(taxTenants),
+  address: one(addresses, {
+    fields: [tenants.address_id],
+    references: [addresses.id],
+  }),
 }));
 
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ many, one }) => ({
   tenants: many(tenantUsers),
+  roles: many(roleUser),
+  address: one(addresses, {
+    fields: [users.address_id],
+    references: [addresses.id],
+  }),
+}));
+
+export const provincesRelations = relations(provinces, ({ many }) => ({
+  locations: many(locations),
+}));
+
+export const locationsRelations = relations(locations, ({ one, many }) => ({
+  province: one(provinces, {
+    fields: [locations.province_id],
+    references: [provinces.id],
+  }),
+  addresses: many(addresses),
+}));
+
+export const addressesRelations = relations(addresses, ({ one, many }) => ({
+  location: one(locations, {
+    fields: [addresses.location_id],
+    references: [locations.id],
+  }),
+  tenants: many(tenants),
+  users: many(users),
 }));
 
 export const tenantUsersRelations = relations(tenantUsers, ({ one }) => ({
@@ -276,6 +407,56 @@ export const invoiceProductsRelations = relations(
   }),
 );
 
+export const rolesRelations = relations(roles, ({ one, many }) => ({
+  tenant: one(tenants, {
+    fields: [roles.tenant_id],
+    references: [tenants.id],
+  }),
+  permissions: many(permissionRole),
+  users: many(roleUser),
+}));
+
+export const permissionsRelations = relations(permissions, ({ many }) => ({
+  roles: many(permissionRole),
+}));
+
+export const permissionRoleRelations = relations(permissionRole, ({ one }) => ({
+  permission: one(permissions, {
+    fields: [permissionRole.permission_id],
+    references: [permissions.id],
+  }),
+  role: one(roles, {
+    fields: [permissionRole.role_id],
+    references: [roles.id],
+  }),
+}));
+
+export const roleUserRelations = relations(roleUser, ({ one }) => ({
+  role: one(roles, {
+    fields: [roleUser.role_id],
+    references: [roles.id],
+  }),
+  user: one(users, {
+    fields: [roleUser.user_id],
+    references: [users.id],
+  }),
+}));
+
+export const taxesRelations = relations(taxes, ({ many }) => ({
+  tenants: many(taxTenants),
+}));
+
+export const taxTenantsRelations = relations(taxTenants, ({ one }) => ({
+  tenant: one(tenants, {
+    fields: [taxTenants.tenant_id],
+    references: [tenants.id],
+  }),
+  tax: one(taxes, {
+    fields: [taxTenants.tax_id],
+    references: [taxes.id],
+  }),
+}));
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Tenant = typeof tenants.$inferSelect;
@@ -286,3 +467,11 @@ export type Invoice = typeof invoices.$inferSelect;
 export type NewInvoice = typeof invoices.$inferInsert;
 export type Counterparty = typeof counterparties.$inferSelect;
 export type NewCounterparty = typeof counterparties.$inferInsert;
+export type Role = typeof roles.$inferSelect;
+export type NewRole = typeof roles.$inferInsert;
+export type Permission = typeof permissions.$inferSelect;
+export type NewPermission = typeof permissions.$inferInsert;
+export type Tax = typeof taxes.$inferSelect;
+export type NewTax = typeof taxes.$inferInsert;
+export type TaxTenant = typeof taxTenants.$inferSelect;
+export type NewTaxTenant = typeof taxTenants.$inferInsert;
