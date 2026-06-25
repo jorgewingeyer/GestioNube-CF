@@ -86,7 +86,7 @@ Los **API Actions** son funciones puras que reciben la base de datos y los pará
 // apps/api/src/actions/products/getProduct.action.ts
 import * as schema from "../../db/schema";
 import { eq } from "drizzle-orm";
-import { DrizzleD1Database } from "drizzle-orm/d1";
+import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { NotFoundError } from "../../errors";
 
 /**
@@ -97,14 +97,14 @@ import { NotFoundError } from "../../errors";
  * @returns The found product record.
  */
 export const getProductAction = async (
-  db: DrizzleD1Database<typeof schema>,
+  db: PostgresJsDatabase<typeof schema>,
   productId: number,
 ) => {
-  const product = await db
+  const [product] = await db
     .select()
     .from(schema.products)
     .where(eq(schema.products.id, productId))
-    .get();
+    .limit(1);
 
   if (!product) {
     throw new NotFoundError("El producto solicitado no existe o fue eliminado.");

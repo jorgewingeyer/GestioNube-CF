@@ -3,12 +3,8 @@ import * as schema from "./db/schema";
 import { Logger } from "@repo/logger";
 
 export interface Env {
-  // Cloudflare Hyperdrive binding
-  HYPERDRIVE: {
-    connectionString: string;
-  };
-  // Fallback for local development if not using Hyperdrive local binding
-  DATABASE_URL?: string;
+  // Cloudflare Hyperdrive binding using native type
+  HYPERDRIVE: Hyperdrive;
   JWT_SECRET?: string;
 }
 

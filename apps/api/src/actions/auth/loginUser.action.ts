@@ -7,6 +7,7 @@ import { AuthenticationError } from "../../errors";
 /**
  * Login user and generate JWT token.
  * Throws AuthenticationError if user is not found or verification fails.
+ * Selecting only columns that exist in the current physical database.
  * @param db - Database instance.
  * @param input - Login credentials.
  * @param jwtSecret - Private secret for token signature.
@@ -19,7 +20,11 @@ export const loginUserAction = async (
 ) => {
   // Find user by email
   const [user] = await db
-    .select()
+    .select({
+      id: schema.users.id,
+      email: schema.users.email,
+      password: schema.users.password,
+    })
     .from(schema.users)
     .where(eq(schema.users.email, input.email))
     .limit(1);

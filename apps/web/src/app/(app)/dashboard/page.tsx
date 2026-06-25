@@ -1,17 +1,15 @@
-import { api } from "@/lib/api-client";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardContent,
+  CardDescription,
 } from "@repo/ui/components/card";
 import { toArgTime } from "@/lib/timezone";
+import { listUsersAction, UserType } from "@/actions/users/list-users-action";
 
 export default async function DashboardPage() {
-  const res = await api.users.list.$get();
-  const response = await res.json();
-
-  const users = response.success && "data" in response ? response.data : [];
+  const users: UserType[] = await listUsersAction();
 
   return (
     <div>
@@ -23,12 +21,13 @@ export default async function DashboardPage() {
         {users.map((user) => (
           <Card key={user.id}>
             <CardHeader>
-              <CardTitle>{user.email}</CardTitle>
+              <CardTitle>{user.name}</CardTitle>
+              <CardDescription>{user.email}</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">ID: {user.id}</p>
               <p className="text-sm text-muted-foreground">
-                Joined: {toArgTime(user.createdAt!, "Y-m-d")}
+                Joined: {toArgTime(user.created_at!, "Y-m-d")}
               </p>
             </CardContent>
           </Card>

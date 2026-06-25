@@ -1,11 +1,12 @@
 import { Hono } from "hono";
 import { listUsersAction } from "../../actions/users/listUsers.action";
-import { createDb } from "../../db";
+import { Env, CustomVars } from "../../context";
 
 export const listRouter = new Hono<{
-  Bindings: { DB: D1Database };
+  Bindings: Env;
+  Variables: CustomVars;
 }>().get("/", async (c) => {
-  const db = createDb(c.env.DB);
+  const db = c.get("db");
   try {
     const result = await listUsersAction(db);
     return c.json({

@@ -9,10 +9,12 @@ const app = new Hono<{ Bindings: Env; Variables: CustomVars }>();
 
 // Global middleware to inject DB and Logger context on every request
 app.use("*", async (c, next) => {
-  const connectionString = c.env.HYPERDRIVE?.connectionString || c.env.DATABASE_URL;
+  const connectionString = c.env.HYPERDRIVE?.connectionString;
 
   if (!connectionString) {
-    throw new Error("Database connection string is missing. Check HYPERDRIVE or DATABASE_URL env vars.");
+    throw new Error(
+      "Hyperdrive connection string is missing. Check your wrangler.toml or Cloudflare dashboard configuration.",
+    );
   }
 
   const db = createDb(connectionString);
