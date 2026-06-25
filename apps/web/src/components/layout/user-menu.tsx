@@ -19,12 +19,6 @@ import Link from "next/link";
 import { LogoutButton } from "../logout-button";
 import { useLogout } from "@/app/(app)/hooks/use-logout";
 
-interface userProps {
-  name: string;
-  email: string;
-  avatar_url: string;
-}
-
 const UserMenu = () => {
   const { setOpen } = useLogout();
   // const { user } = usePage().props as Partial<{ user: userProps }>;
