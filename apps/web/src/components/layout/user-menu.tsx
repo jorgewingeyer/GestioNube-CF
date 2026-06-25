@@ -16,6 +16,8 @@ import {
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
 import Link from "next/link";
+import { LogoutButton } from "../logout-button";
+import { useLogout } from "@/app/(app)/hooks/use-logout";
 
 interface userProps {
   name: string;
@@ -24,6 +26,7 @@ interface userProps {
 }
 
 const UserMenu = () => {
+  const { setOpen } = useLogout();
   // const { user } = usePage().props as Partial<{ user: userProps }>;
   // const fullUser = usePage().props.user as UserType | undefined;
   // const isSuperAdmin = fullUser?.roles?.some((r) => r.name === "super-admin");
@@ -77,11 +80,9 @@ const UserMenu = () => {
         )}
 
         <DropdownMenuSeparator />
+
         <DropdownMenuItem className="cursor-pointer w-full" asChild>
-          <Link href="/logout">
-            <LogOut className="mr-2 h-4 w-4" />
-            Cerrar Sesión
-          </Link>
+          <LogoutButton />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
