@@ -1,6 +1,6 @@
 import * as schema from "../../db/schema";
 import { eq } from "drizzle-orm";
-import { DrizzleD1Database } from "drizzle-orm/d1";
+import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { hashPassword } from "../../lib/crypto";
 import { DuplicateEmailError } from "../../errors";
 
@@ -12,15 +12,15 @@ import { DuplicateEmailError } from "../../errors";
  * @returns Created user details.
  */
 export const registerUserAction = async (
-  db: DrizzleD1Database<typeof schema>,
+  db: PostgresJsDatabase<typeof schema>,
   input: { name: string; email: string; password: string },
 ) => {
   // Check if user already exists
-  const existing = await db
+  const [existing] = await db
     .select()
     .from(schema.users)
     .where(eq(schema.users.email, input.email))
-    .get();
+    .limit(1);
 
   if (existing) {
     throw new DuplicateEmailError();
@@ -30,13 +30,14 @@ export const registerUserAction = async (
   const hashedPassword = await hashPassword(input.password);
 
   // Create user
-  return await db
+  const [newUser] = await db
     .insert(schema.users)
     .values({
       name: input.name,
       email: input.email,
       password: hashedPassword,
     })
-    .returning()
-    .get();
+    .returning();
+
+  return newUser;
 };

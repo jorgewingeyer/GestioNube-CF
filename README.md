@@ -1,6 +1,6 @@
 # CF Turborepo Next Hono
 
-Este proyecto es un monorepo Turborepo que integra Next.js (Frontend) y Hono (Backend) sobre Cloudflare Workers/Pages, utilizando D1 como base de datos y Drizzle ORM.
+Este proyecto es un monorepo Turborepo que integra Next.js (Frontend) y Hono (Backend) sobre Cloudflare Workers/Pages, utilizando **PostgreSQL** mediante **Cloudflare Hyperdrive** y Drizzle ORM.
 
 ## Instalación rápida 🚀
 
@@ -22,16 +22,40 @@ Estos comandos se ejecutan desde la raíz del proyecto y orquestan tareas en tod
 | `pnpm format`      | Formatea el código de todo el proyecto usando Prettier.                        |
 | `pnpm check-types` | Verifica los tipos de TypeScript en todo el proyecto.                          |
 
-## Gestión de Base de Datos (D1 + Drizzle)
+## Configuración de Base de Datos (PostgreSQL) 🐘
 
-Comandos para gestionar la base de datos Cloudflare D1.
+El proyecto ha sido migrado de D1 a PostgreSQL para mayor escalabilidad.
 
-| Comando               | Descripción                                                                                      |
-| :-------------------- | :----------------------------------------------------------------------------------------------- |
+### Entorno Local
+
+Para conectar la API a tu base de datos local:
+
+1. Crea un archivo `.dev.vars` en `apps/api/` (puedes usar `.dev.vars.example` como base).
+2. Define las variables de conexión:
+   ```env
+   DATABASE_URL=postgres://usuario:contraseña@127.0.0.1:5432/nombre_db
+   CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE=postgres://usuario:contraseña@127.0.0.1:5432/nombre_db
+   ```
+   _Nota: La segunda variable es requerida por Wrangler para emular Hyperdrive localmente._
+3. Wrangler cargará automáticamente estas variables al ejecutar `pnpm dev`.
+
+### Producción (Hyperdrive)
+
+En producción, la conexión se gestiona a través de **Cloudflare Hyperdrive** para optimizar el pool de conexiones:
+
+1. Asegúrate de tener configurado el binding `[[hyperdrive]]` en `apps/api/wrangler.toml`.
+2. El sistema utilizará automáticamente `env.HYPERDRIVE.connectionString`.
+
+## Gestión de Base de Datos (Drizzle)
+
+Comandos para gestionar la base de datos PostgreSQL.
+
+| Comando               | Descripción                                                                                          |
+| :-------------------- | :--------------------------------------------------------------------------------------------------- |
 | `pnpm db:generate`    | Genera los archivos de migración SQL basados en los cambios del esquema Drizzle (`apps/api/src/db`). |
-| `pnpm migrate:local`  | Aplica las migraciones pendientes a la base de datos D1 **local**.                               |
-| `pnpm migrate:remote` | Aplica las migraciones pendientes a la base de datos D1 **remota (producción)**.                 |
-| `pnpm db:studio`      | Abre Drizzle Studio para visualizar y editar la base de datos localmente.                        |
+| `pnpm migrate:local`  | Aplica las migraciones pendientes a la base de datos PostgreSQL **local**.                           |
+| `pnpm migrate:remote` | Aplica las migraciones pendientes a la base de datos PostgreSQL **remota (producción)**.             |
+| `pnpm db:studio`      | Abre Drizzle Studio para visualizar y editar la base de datos localmente.                            |
 
 ## Comandos Específicos por Aplicación
 

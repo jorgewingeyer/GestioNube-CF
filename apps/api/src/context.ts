@@ -1,10 +1,14 @@
-import { DrizzleD1Database } from "drizzle-orm/d1";
+import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import * as schema from "./db/schema";
 import { Logger } from "@repo/logger";
-import { createDb } from "./db";
 
 export interface Env {
-  DB: D1Database;
+  // Cloudflare Hyperdrive binding
+  HYPERDRIVE: {
+    connectionString: string;
+  };
+  // Fallback for local development if not using Hyperdrive local binding
+  DATABASE_URL?: string;
   JWT_SECRET?: string;
 }
 
@@ -13,17 +17,7 @@ export interface Env {
  */
 export interface CustomVars {
   /** Injected Drizzle ORM database instance */
-  db: DrizzleD1Database<typeof schema>;
+  db: PostgresJsDatabase<typeof schema>;
   /** Injected structured Logger instance */
   logger: Logger;
 }
-
-export function createContext(env: Env) {
-  const db = createDb(env.DB);
-  return {
-    db,
-    env,
-  };
-}
-
-export type Context = Awaited<ReturnType<typeof createContext>>;

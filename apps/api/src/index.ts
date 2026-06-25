@@ -9,7 +9,13 @@ const app = new Hono<{ Bindings: Env; Variables: CustomVars }>();
 
 // Global middleware to inject DB and Logger context on every request
 app.use("*", async (c, next) => {
-  const db = createDb(c.env.DB);
+  const connectionString = c.env.HYPERDRIVE?.connectionString || c.env.DATABASE_URL;
+
+  if (!connectionString) {
+    throw new Error("Database connection string is missing. Check HYPERDRIVE or DATABASE_URL env vars.");
+  }
+
+  const db = createDb(connectionString);
   const logger = new Logger("API:Request");
 
   c.set("db", db);

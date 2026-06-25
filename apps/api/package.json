@@ -10,23 +10,25 @@
   },
   "dependencies": {
     "@hono/zod-validator": "^0.8.0",
+    "@repo/logger": "workspace:*",
+    "bcryptjs": "^3.0.3",
     "drizzle-orm": "^0.45.2",
     "hono": "^4.12.26",
     "jose": "^6.1.3",
+    "postgres": "^3.4.9",
     "react": "19.2.7",
     "react-dom": "19.2.7",
     "react-hook-form": "7.80.0",
-    "zod": "^4.3.6",
-    "@repo/logger": "workspace:*"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260621.1",
     "@repo/typescript-config": "workspace:*",
-    "@types/better-sqlite3": "^7.6.13",
+    "@types/bcryptjs": "^3.0.0",
     "@types/node": "^26.0.0",
     "@types/react": "19.2.2",
     "@types/react-dom": "19.2.2",
-    "better-sqlite3": "^12.11.1",
+    "dotenv": "^17.4.2",
     "drizzle-kit": "^0.31.10",
     "typescript": "^6.0.3",
     "wrangler": "^4.103.0"

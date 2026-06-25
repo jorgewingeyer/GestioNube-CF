@@ -1,9 +1,9 @@
 name = "api"
 main = "src/index.ts"
 compatibility_date = "2024-04-01"
+compatibility_flags = ["nodejs_compat"]
 
-[[d1_databases]]
-binding = "DB"
-database_name = "my-db"
-database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-migrations_dir = "./drizzle"
+[[hyperdrive]]
+binding = "HYPERDRIVE"
+id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"                                        # Replace with your Hyperdrive ID
+localConnectionString = "postgres://postgres:password@127.0.0.1:5432/inventia"
