@@ -1,87 +1,43 @@
 import { SignJWT, jwtVerify } from "jose";
+import bcrypt from "bcryptjs";
 
-// PBKDF2 configuration
-const PBKDF2_ITERATIONS = 100000;
-const SALT_LENGTH = 16;
-const KEY_LENGTH = 64;
-const DIGEST = "SHA-512";
+// Hashing configuration
+const BCRYPT_ROUNDS = 12;
 
 /**
- * Hashes a password using PBKDF2
- * Format: salt:hash
+ * Hashes a password using Bcrypt (Laravel compatible)
+ * @param password The plain text password
+ * @returns The hashed password string
  */
 export async function hashPassword(password: string): Promise<string> {
-  const salt = crypto.getRandomValues(new Uint8Array(SALT_LENGTH));
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(password),
-    { name: "PBKDF2" },
-    false,
-    ["deriveBits", "deriveKey"],
-  );
-
-  const derivedKey = await crypto.subtle.deriveBits(
-    {
-      name: "PBKDF2",
-      salt,
-      iterations: PBKDF2_ITERATIONS,
-      hash: DIGEST,
-    },
-    key,
-    KEY_LENGTH * 8,
-  );
-
-  const saltHex = Array.from(salt)
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-  const hashHex = Array.from(new Uint8Array(derivedKey))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-
-  return `${saltHex}:${hashHex}`;
+  return bcrypt.hash(password, BCRYPT_ROUNDS);
 }
 
 /**
- * Verifies a password against a stored hash
+ * Verifies a password against a stored hash (Laravel compatible)
+ * @param password The plain text password
+ * @param storedHash The hashed password from the database (e.g., $2y$12$...)
+ * @returns True if the password matches the hash
  */
 export async function verifyPassword(
   password: string,
   storedHash: string,
 ): Promise<boolean> {
-  const [saltHex, hashHex] = storedHash.split(":");
-  if (!saltHex || !hashHex) return false;
-
-  const salt = new Uint8Array(
-    saltHex.match(/.{1,2}/g)!.map((byte) => parseInt(byte, 16)),
-  );
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(password),
-    { name: "PBKDF2" },
-    false,
-    ["deriveBits", "deriveKey"],
-  );
-
-  const derivedKey = await crypto.subtle.deriveBits(
-    {
-      name: "PBKDF2",
-      salt,
-      iterations: PBKDF2_ITERATIONS,
-      hash: DIGEST,
-    },
-    key,
-    KEY_LENGTH * 8,
-  );
-
-  const derivedHashHex = Array.from(new Uint8Array(derivedKey))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-
-  return derivedHashHex === hashHex;
+  try {
+    // bcryptjs.compare handles extraction of salt/rounds from the hash string
+    // It is compatible with Laravel's $2y$ prefix by normalising it to $2a$
+    const hashToVerify = storedHash.replace(/^\$2y\$/, "$2a$");
+    return await bcrypt.compare(password, hashToVerify);
+  } catch (error) {
+    return false;
+  }
 }
 
 /**
- * Signs a JWT
+ * Signs a JWT using jose (Edge compatible)
+ * @param payload The data to be encoded in the JWT
+ * @param secret The secret key for signing
+ * @returns The signed JWT string
  */
 export async function signJWT(payload: any, secret: string): Promise<string> {
   const secretKey = new TextEncoder().encode(secret);
@@ -93,7 +49,10 @@ export async function signJWT(payload: any, secret: string): Promise<string> {
 }
 
 /**
- * Verifies a JWT
+ * Verifies a JWT using jose (Edge compatible)
+ * @param token The JWT string to verify
+ * @param secret The secret key for verification
+ * @returns The decoded payload or null if invalid
  */
 export async function verifyJWT(token: string, secret: string): Promise<any> {
   try {

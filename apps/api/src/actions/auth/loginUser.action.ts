@@ -1,28 +1,33 @@
 import * as schema from "../../db/schema";
 import { eq } from "drizzle-orm";
-import { DrizzleD1Database } from "drizzle-orm/d1";
+import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { signJWT, verifyPassword } from "../../lib/crypto";
 import { AuthenticationError } from "../../errors";
 
 /**
  * Login user and generate JWT token.
  * Throws AuthenticationError if user is not found or verification fails.
+ * Selecting only columns that exist in the current physical database.
  * @param db - Database instance.
  * @param input - Login credentials.
  * @param jwtSecret - Private secret for token signature.
  * @returns User data and token.
  */
 export const loginUserAction = async (
-  db: DrizzleD1Database<typeof schema>,
+  db: PostgresJsDatabase<typeof schema>,
   input: { email: string; password: string },
   jwtSecret: string,
 ) => {
   // Find user by email
-  const user = await db
-    .select()
+  const [user] = await db
+    .select({
+      id: schema.users.id,
+      email: schema.users.email,
+      password: schema.users.password,
+    })
     .from(schema.users)
     .where(eq(schema.users.email, input.email))
-    .get();
+    .limit(1);
 
   if (!user) {
     throw new AuthenticationError(

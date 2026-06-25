@@ -8,8 +8,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
     "db:generate": "pnpm --filter @repo/api db:generate",
-    "migrate:local": "pnpm --filter @repo/api exec -- wrangler d1 migrations apply DB --local",
-    "migrate:remote": "pnpm --filter @repo/api exec -- wrangler d1 migrations apply DB --remote",
+    "migrate:local": "pnpm --filter @repo/api db:migrate",
     "db:studio": "pnpm --filter @repo/api db:studio",
     "ui:add": "cd packages/ui && pnpm dlx shadcn@latest add"
   },
