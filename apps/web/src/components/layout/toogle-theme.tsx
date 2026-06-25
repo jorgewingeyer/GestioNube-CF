@@ -1,6 +1,5 @@
 "use client";
-import { Moon, Sun, SunMoon } from "lucide-react";
-
+import { LaptopMinimal, Moon, Sun } from "lucide-react";
 import { Button } from "@repo/ui/components/button";
 import {
   DropdownMenu,
@@ -32,7 +31,7 @@ export function ToggleTheme() {
           Oscuro
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("system")}>
-          <SunMoon className="h-4 w-4 mr-2" />
+          <LaptopMinimal className="h-4 w-4 mr-2" />
           Sistema
         </DropdownMenuItem>
       </DropdownMenuContent>

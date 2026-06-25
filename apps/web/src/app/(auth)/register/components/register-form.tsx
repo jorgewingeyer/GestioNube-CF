@@ -83,6 +83,26 @@ export function RegisterForm() {
           )}
         />
 
+        <Controller
+          name="passwordConfirmation"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>Confirmar Contraseña</FieldLabel>
+              <Input
+                {...field}
+                id={field.name}
+                type="password"
+                placeholder="••••••••"
+                autoComplete="new-password"
+                disabled={isSubmitting}
+                aria-invalid={fieldState.invalid}
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
         <Button type="submit" className="w-full" disabled={isSubmitting}>
           {isSubmitting && <Spinner />}
           Crear Cuenta

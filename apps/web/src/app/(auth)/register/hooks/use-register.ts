@@ -16,6 +16,7 @@ export function useRegister() {
       name: "",
       email: "",
       password: "",
+      passwordConfirmation: "",
     },
   });
 
@@ -24,8 +25,8 @@ export function useRegister() {
   async function onSubmit(values: RegisterSchema) {
     await toasted({
       action: () => registerAction(values),
-      loadingMessage: "Creando tu cuenta...",
-      onSuccess: () => router.push("/login"),
+      loadingMessage: "Creando tu cuenta y configurando tu empresa...",
+      onSuccess: () => router.push("/dashboard"),
     });
   }
 

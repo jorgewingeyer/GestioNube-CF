@@ -8,6 +8,27 @@
       "when": 1782398110520,
       "tag": "0000_cute_leader",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1782420510529,
+      "tag": "0001_previous_lethal_legion",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1782421000000,
+      "tag": "0002_seed_provinces",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1782421100000,
+      "tag": "0003_seed_locations",
+      "breakpoints": true
     }
   ]
 }
